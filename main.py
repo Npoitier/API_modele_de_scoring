@@ -73,8 +73,8 @@ def prediction(model_name, id_pret, metric):
     
     return int(score),classe
 
-def shap_importance(model_name,id_pret):
-
+def shap_importance(model_name,id_pret, metric):
+    # penser à construire pour l'autre métrique et à différentier les noms
     chemin = 'https://raw.githubusercontent.com/Npoitier/API_modele_de_scoring/main/'
     df_shap_values = pd.read_csv(chemin + 'data/' +model_name+"_shap_values.csv",
                                  index_col=0, encoding ='utf-8')
@@ -150,7 +150,8 @@ def predict(model: str, id: int, response: Response):
     
 @app.get("/shap/{model}/indice/{id}")
 async def shap(model: str, id: int, response: Response):
-    features_dictionary = shap_importance(model,id)
+    metric = 'average_precision_score'
+    features_dictionary = shap_importance(model,id, metric)
     return features_dictionary
     
 @app.get("/lime/{model}/indice/{id}")
