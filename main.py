@@ -95,6 +95,44 @@ def shap_importance(model_name,id_pret):
         features_dictionary[bars[i]] =height[i]   
     
     return features_dictionary
+    
+def lime_importance(model_name, id_pret):
+
+    chemin, data, target = load_data()
+    
+    model, features, seuil = load_model(chemin, model_name)
+    X=data[features].copy()   
+    preproc = load_preprocessing(chemin, model_name)    
+    X_transform = preproc.transform(X) 
+    list_colonnes = preproc.get_feature_names_out().tolist()
+    list_colonnes = pd.Series(list_colonnes).str.replace('quanti__','').str.replace('remainder__','').str.replace('quali__','').tolist()
+    X_transform = pd.DataFrame(X_transform,columns=list_colonnes)
+    X_transform = X_transform.rename(columns = lambda x:re.sub('[^A-Za-z0-9_]+', '', x)) 
+    list_colonnes = X_transform.columns.tolist()
+    X_transform.index = X.index
+    explainer = lime_tabular.LimeTabularExplainer(X_transform, mode="classification",
+                                              class_names=["Solvable", "Non Solvable"],
+                                              feature_names=list_colonnes,
+                                                 discretize_continuous=False)
+    expdt0 = explainer.explain_instance(np.array(X_transform[X_transform.index == int(id_pret)].T).ravel(),
+                                        model.predict_proba ,num_features=len(list_colonnes))
+    test = np.array(expdt0.local_exp.get(1))
+    list_cols = [list_colonnes[int(i)] for i in test[:,0]]
+    height = test[:,1].tolist() 
+    height.reverse()    
+    #somme = np.sum(height)
+    maxi = np.max(np.abs(height))
+    mini = np.min(np.abs(height))
+    bars = list_cols
+    bars.reverse()
+    bars = [bars[x] for x in range(len(height)) if np.abs(height[x]) >= maxi*0.05]
+    height = [height[x] for x in range(len(height)) if np.abs(height[x]) >= maxi*0.05]
+    
+    features_dictionary = dict()
+    for i in range(len(height)):    
+        features_dictionary[bars[i]] =height[i]   
+    
+    return features_dictionary
 
 @app.get("/")
 def hello():
@@ -115,7 +153,8 @@ async def shap(model: str, id: int, response: Response):
     features_dictionary = shap_importance(model,id)
     return features_dictionary
     
-#@app.get("/lime/{id}")    
-#async def lime(id : int, response: Response):
-#    return features_dictionary
+@app.get("/lime/{model}/indice/{id}")
+async def lime(id : int, response: Response):
+    features_dictionary = lime_importance(model, id)
+    return features_dictionary
     
