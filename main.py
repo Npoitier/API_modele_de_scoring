@@ -79,7 +79,7 @@ def hello():
     
 @app.get("/predict/{model}/indice/{id}")
 def predict(model: str, id: int, response: Response):
-    score,classe = prediction(model_name, id_pret)
+    score,classe = prediction(model, id)
     # si non trouvé
     #response.status_code = 404
     
