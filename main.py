@@ -77,7 +77,7 @@ def prediction(model_name, id_pret):
 def hello():
     return {"message":"Hello you"}
     
-@app.get("/predict/{model}{id}")
+@app.get("/predict/{model}/indice/{id}")
 def predict(model: str, id: int, response: Response):
     score,classe = prediction(model_name, id_pret)
     # si non trouvé
