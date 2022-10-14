@@ -154,7 +154,7 @@ async def shap(model: str, id: int, response: Response):
     return features_dictionary
     
 @app.get("/lime/{model}/indice/{id}")
-async def lime(id : int, response: Response):
+async def lime(model: str, id: int, response: Response):
     features_dictionary = lime_importance(model, id)
     return features_dictionary
     
