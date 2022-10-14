@@ -30,7 +30,7 @@ def load_preprocessing(chemin, model_name):
     model = pickle.load(open(filename, 'rb'))
     return model
 
-def load_model(chemin, model_name):
+def load_model(chemin, model_name, metric = 'average_precision_score'):
     #file = open(chemin + 'data/' + model_name +'_TL_SN_pipe_final_colonnes.csv', "r")
     #file = pd.read_csv(chemin + 'data/' + model_name +'_TL_SN_pipe_final_colonnes.csv', header=0, encoding ='utf-8')
     file = pd.read_csv(chemin + 'data/' + model_name +'_TL_SN_pipe_final_colonnes.csv', header=None, names=['col_name'], encoding ='utf-8')
@@ -39,11 +39,10 @@ def load_model(chemin, model_name):
     #features = []
     #for line in file :    
     #    features.append(line.replace('\n',''))
-    if 	model_name == 'RandomForestClassifier':
-        seuil = 0.1
-    else :
-        seuil = 0.5
-
+    file = 'data/' + 'Seuils.csv'
+    df_seuils = pd.read_csv(chemin+file,index_col=0)    
+    seuil = float(df_seuils.loc[((df_seuils['Classifier']==model_name)&(df_seuils['metric']==metric)),'seuil'].head(1).item())
+    
     #filename = chemin + 'average_precision_score/'+'TL_SN_pipe' + model_name +'_final_model.sav''./' +'/average_precision_score/'+ 
     filename = chemin_models+'TL_SN_pipe' + model_name +'_final_model.sav'
     model = pickle.load(open(filename, 'rb'))
@@ -55,11 +54,11 @@ def target_score(target,id_pret):
     classe = classe.iloc[0].item()
     return classe
 
-def prediction(model_name, id_pret):
+def prediction(model_name, id_pret, metric):
 
     chemin, data, target = load_data()
     
-    model, features, seuil = load_model(chemin, model_name)
+    model, features, seuil = load_model(chemin, model_name, metric)
     X=data[features].copy()    
     preproc = load_preprocessing(chemin, model_name)
     X_transform = preproc.transform(X[X.index == int(id_pret)])
@@ -96,11 +95,11 @@ def shap_importance(model_name,id_pret):
     
     return features_dictionary
     
-def lime_importance(model_name, id_pret):
+def lime_importance(model_name, id_pret, metric):
 
     chemin, data, target = load_data()
     
-    model, features, seuil = load_model(chemin, model_name)
+    model, features, seuil = load_model(chemin, model_name, metric)
     X=data[features].copy()   
     preproc = load_preprocessing(chemin, model_name)    
     X_transform = preproc.transform(X) 
@@ -140,7 +139,8 @@ def hello():
     
 @app.get("/predict/{model}/indice/{id}")
 def predict(model: str, id: int, response: Response):
-    score,classe = prediction(model, id)
+    metric = 'average_precision_score'
+    score,classe = prediction(model, id, metric)
     # si non trouvé
     #response.status_code = 404
     
@@ -155,6 +155,7 @@ async def shap(model: str, id: int, response: Response):
     
 @app.get("/lime/{model}/indice/{id}")
 async def lime(model: str, id: int, response: Response):
-    features_dictionary = lime_importance(model, id)
+    metric = 'average_precision_score'
+    features_dictionary = lime_importance(model, id, metric)
     return features_dictionary
     
