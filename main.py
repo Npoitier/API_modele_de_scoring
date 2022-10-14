@@ -14,6 +14,7 @@ chemin_models = "./models/"
 def load_data():
     chemin = 'C:/Users/nisae/OneDrive/Documents/jupyter_notebook/P7_Poitier_Nicolas/Dashboard/'
     chemin = 'https://raw.githubusercontent.com/Npoitier/Implementez_un_modele_de_scoring/main/'
+    chemin = 'https://raw.githubusercontent.com/Npoitier/API_modele_de_scoring/main/'
 
     Liste_des_prets = chemin + 'data/Dashboard_submitt_values.csv'
     data = pd.read_csv(Liste_des_prets, index_col=0, encoding ='utf-8')
@@ -73,6 +74,28 @@ def prediction(model_name, id_pret):
     
     return int(score),classe
 
+def shap_importance(model_name,id_pret):
+
+    chemin = 'https://raw.githubusercontent.com/Npoitier/API_modele_de_scoring/main/'
+    df_shap_values = pd.read_csv(chemin + 'data/' +model_name+"_shap_values.csv",
+                                 index_col=0, encoding ='utf-8')
+    #height = list(df_shap_values.iloc[id_pret])
+    height = df_shap_values[df_shap_values.index == int(id_pret)]
+    height = np.array(height.T)
+    height = height[:,0].tolist()
+    #somme = np.sum(height)
+    maxi = np.max(np.abs(height))
+    mini = np.min(np.abs(height))
+    bars = df_shap_values.columns.tolist()
+    bars = [bars[x] for x in range(len(height)) if np.abs(height[x]) >= maxi*0.05]
+    height = [height[x] for x in range(len(height)) if np.abs(height[x]) >= maxi*0.05]
+    
+    features_dictionary = dict()
+    for i in range(len(height)):    
+        features_dictionary[bars[i]] =height[i]   
+    
+    return features_dictionary
+
 @app.get("/")
 def hello():
     return {"message":"Hello you"}
@@ -87,9 +110,10 @@ def predict(model: str, id: int, response: Response):
     
     return predict_value
     
-#@app.get("/shap/{id}")    
-#async def shap(id : int, response: Response):
-#    return features_dictionary
+@app.get("/shap/{model}/indice/{id}")
+async def shap(model: str, id: int, response: Response):
+    features_dictionary = shap_importance(model,id)
+    return features_dictionary
     
 #@app.get("/lime/{id}")    
 #async def lime(id : int, response: Response):
