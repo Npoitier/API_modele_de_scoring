@@ -137,9 +137,9 @@ def lime_importance(model_name, id_pret, metric):
 def hello():
     return {"message":"Hello you"}
     
-@app.get("/predict/{model}/indice/{id}")
-def predict(model: str, id: int, response: Response):
-    metric = 'average_precision_score'
+@app.get("/predict/{model}/metric/{metric}/indice/{id}")
+def predict(model: str, metric : str, id: int, response: Response):
+    #metric = 'average_precision_score'
     score,classe = prediction(model, id, metric)
     # si non trouvé
     #response.status_code = 404
@@ -148,15 +148,15 @@ def predict(model: str, id: int, response: Response):
     
     return predict_value
     
-@app.get("/shap/{model}/indice/{id}")
-async def shap(model: str, id: int, response: Response):
-    metric = 'average_precision_score'
+@app.get("/shap/{model}/metric/{metric}/indice/{id}")
+async def shap(model: str, metric : str, id: int, response: Response):
+    #metric = 'average_precision_score'
     features_dictionary = shap_importance(model,id, metric)
     return features_dictionary
     
-@app.get("/lime/{model}/indice/{id}")
-async def lime(model: str, id: int, response: Response):
-    metric = 'average_precision_score'
+@app.get("/lime/{model}/metric/{metric}/indice/{id}")
+async def lime(model: str, metric : str, id: int, response: Response):
+    #metric = 'average_precision_score'
     features_dictionary = lime_importance(model, id, metric)
     return features_dictionary
     
