@@ -44,7 +44,7 @@ def load_model(chemin, model_name, metric = 'average_precision_score'):
     seuil = float(df_seuils.loc[((df_seuils['Classifier']==model_name)&(df_seuils['metric']==metric)),'seuil'].head(1).item())
     
     #filename = chemin + 'average_precision_score/'+'TL_SN_pipe' + model_name +'_final_model.sav''./' +'/average_precision_score/'+ 
-    filename = chemin_models+'TL_SN_pipe' + model_name +'_final_model.sav'
+    filename = chemin_models+'TL_SN_pipe' + model_name +metric+'_final_model.sav'
     model = pickle.load(open(filename, 'rb'))
 
     return model, features, seuil
@@ -76,7 +76,7 @@ def prediction(model_name, id_pret, metric):
 def shap_importance(model_name,id_pret, metric):
     # penser à construire pour l'autre métrique et à différentier les noms
     chemin = 'https://raw.githubusercontent.com/Npoitier/API_modele_de_scoring/main/'
-    df_shap_values = pd.read_csv(chemin + 'data/' +model_name+"_shap_values.csv",
+    df_shap_values = pd.read_csv(chemin + 'data/' +model_name+metric+"_shap_values.csv",
                                  index_col=0, encoding ='utf-8')
     #height = list(df_shap_values.iloc[id_pret])
     height = df_shap_values[df_shap_values.index == int(id_pret)]
