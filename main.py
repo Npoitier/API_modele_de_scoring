@@ -76,10 +76,10 @@ def prediction(model_name, id_pret, metric):
     
     classe = target_score(target,id_pret)
     
-    if seuil-score >= 0 :
-        percent_fiabilite = np.abs(seuil-score)/seuil*100
+    if seuil-float(predic_classe) >= 0 :
+        percent_fiabilite = np.abs(seuil-float(predic_classe))/seuil*100
     else : 
-        percent_fiabilite = np.abs(seuil-score)/(1-seuil)*100
+        percent_fiabilite = np.abs(seuil-float(predic_classe))/(1-seuil)*100
     
     return int(score),classe, percent_fiabilite
 
