@@ -171,6 +171,8 @@ def model_features_importance(model_name, metric):
             list_colonnes = preproc.get_feature_names_out().tolist()
             list_colonnes = pd.Series(list_colonnes).str.replace('quanti__','').str.replace('remainder__','').str.replace('quali__','').tolist()
             features = list_colonnes    
+            for elt in range(len(features)):
+                features[elt] = re.sub('[^A-Za-z0-9_]+', '', features[elt])    
         else:        
             features = model.steps[0][1].feature_names_in_[idx]
                 
