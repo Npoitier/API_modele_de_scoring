@@ -149,6 +149,7 @@ def lime_importance(model_name, id_pret, metric):
 
 def model_features_importance(model_name, metric):
     
+    erreur = ''
     chemin = get_chemin()
     
     model, features, seuil = load_model(chemin, model_name, metric)
@@ -166,15 +167,22 @@ def model_features_importance(model_name, metric):
     values = list_importance[idx]
     
     if hasattr(model.steps[0][1], 'feature_name_'):
-        features = np.array(list(model.steps[0][1].feature_name_)) 
-        features = features[idx]    
+        try: 
+            features = np.array(model.steps[0][1].feature_name_)[idxe]
+        except Exception as e: 
+            erreur = e
+            features = []
+            for i in range(len(idx)):
+                features.append('colonne'+str(idx[i]))    
     else:        
         features = model.steps[0][1].feature_names_in_[idx]
         
     features_dictionary = dict()
     for i in range(len(values)):    
         features_dictionary[features[i]] =values[i] 
-        
+    if erreur != '':        
+        features_dictionary[str(erreur)] = 1000    
+    
     return features_dictionary
 
 @app.get("/")
