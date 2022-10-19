@@ -161,7 +161,7 @@ def model_features_importance(model_name, metric):
         maxi = list_importance[importance[-1]]
         i = -1
         idx = []
-        while (list_importance[importance[i]]> maxi*0.05) :
+        while ((list_importance[importance[i]]>maxi*0.05) & (len(importance)+i != 0 )):        
             idx.append(importance[i])
             i -= 1
         values = list_importance[idx]
