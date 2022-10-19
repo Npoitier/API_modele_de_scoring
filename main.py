@@ -166,7 +166,8 @@ def model_features_importance(model_name, metric):
     values = list_importance[idx]
     
     if hasattr(model.steps[0][1], 'feature_name_'):
-        features = np.array(model.steps[0][1].feature_name_)[idx]
+        features = np.array(list(model.steps[0][1].feature_name_)) 
+        features = features[idx]    
     else:        
         features = model.steps[0][1].feature_names_in_[idx]
         
