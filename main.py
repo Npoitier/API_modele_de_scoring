@@ -19,7 +19,7 @@ def load_data():
     chemin = 'C:/Users/nisae/OneDrive/Documents/jupyter_notebook/P7_Poitier_Nicolas/Dashboard/'
     chemin = 'https://raw.githubusercontent.com/Npoitier/Implementez_un_modele_de_scoring/main/'
     chemin = 'https://raw.githubusercontent.com/Npoitier/API_modele_de_scoring/main/'
-    chemin = get_chemin()
+    #chemin = get_chemin()
 
     Liste_des_prets = chemin + 'data/Dashboard_submitt_values.csv'
     data = pd.read_csv(Liste_des_prets, index_col=0, encoding ='utf-8')
