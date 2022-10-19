@@ -11,10 +11,15 @@ app = FastAPI()
 
 chemin_models = "./models/"
 
+def get_chemin():
+    chemin = 'https://raw.githubusercontent.com/Npoitier/API_modele_de_scoring/main/'
+    return chemin
+
 def load_data():
     chemin = 'C:/Users/nisae/OneDrive/Documents/jupyter_notebook/P7_Poitier_Nicolas/Dashboard/'
     chemin = 'https://raw.githubusercontent.com/Npoitier/Implementez_un_modele_de_scoring/main/'
     chemin = 'https://raw.githubusercontent.com/Npoitier/API_modele_de_scoring/main/'
+    chemin = get_chemin()
 
     Liste_des_prets = chemin + 'data/Dashboard_submitt_values.csv'
     data = pd.read_csv(Liste_des_prets, index_col=0, encoding ='utf-8')
@@ -71,11 +76,18 @@ def prediction(model_name, id_pret, metric):
     
     classe = target_score(target,id_pret)
     
-    return int(score),classe
+    if seuil-score >= 0 :
+        percent_fiabilite = np.abs(seuil-score)/seuil*100
+    else : 
+        percent_fiabilite = np.abs(seuil-score)/(1-seuil)*100
+    
+    return int(score),classe, percent_fiabilite
 
 def shap_importance(model_name,id_pret, metric):
     # penser à construire pour l'autre métrique et à différentier les noms
     chemin = 'https://raw.githubusercontent.com/Npoitier/API_modele_de_scoring/main/'
+    chemin = get_chemin()
+    
     df_shap_values = pd.read_csv(chemin + 'data/' +model_name+metric+"_shap_values.csv",
                                  index_col=0, encoding ='utf-8')
     #height = list(df_shap_values.iloc[id_pret])
@@ -133,18 +145,53 @@ def lime_importance(model_name, id_pret, metric):
     
     return features_dictionary
 
+def model_features_importance(model_name, metric):
+    
+    chemin = get_chemin()
+    
+    model, features, seuil = load_model(chemin, model_name, metric)
+    list_importance = model.steps[0][1].feature_importances_
+    # on classe les indices d'importance des features
+    importance = list_importance.argsort()
+    
+    # on stocke le max
+    maxi = list_importance[importance[-1]]
+    i = -1
+    idx = []
+    while (list_importance[importance[i]]> maxi*0.05) :
+        idx.append(importance[i])
+        i -= 1
+    values = list_importance[idx]
+    
+    if hasattr(model.steps[0][1], 'feature_names_in_'):
+        features = model.steps[0][1].feature_names_in_[idx]
+    else:
+        features = np.array(model.steps[0][1].feature_name_)[idx]
+        
+    features_dictionary = dict()
+    for i in range(len(values)):    
+        features_dictionary[features[i]] =values[i] 
+        
+    return features_dictionary
+
 @app.get("/")
 def hello():
     return {"message":"Hello you"}
     
+@app.get("/featureimportance/{model}/metric/{metric}")
+def featureimportance(model: str, metric : str, response: Response):
+    features_dictionary = model_features_importance(model_name, metric)
+    return features_dictionary
+
+    
 @app.get("/predict/{model}/metric/{metric}/indice/{id}")
 def predict(model: str, metric : str, id: int, response: Response):
     #metric = 'average_precision_score'
-    score,classe = prediction(model, id, metric)
+    score,classe,percent_fiabilite = prediction(model, id, metric)
     # si non trouvé
     #response.status_code = 404
     
-    predict_value = {'score':score,'classe':classe}
+    predict_value = {'score':score,'classe':classe,'fiabilite':percent_fiabilite}
     
     return predict_value
     
