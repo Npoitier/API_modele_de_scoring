@@ -149,10 +149,10 @@ def lime_importance(model_name, id_pret, metric):
 
 def model_features_importance(model_name, metric):
     
-    erreur = ''
+    
     chemin = get_chemin()
     
-    model, features, seuil = load_model(chemin, model_name, metric)
+    model, feat, seuil = load_model(chemin, model_name, metric)
     list_importance = model.steps[0][1].feature_importances_
     # on classe les indices d'importance des features
     importance = list_importance.argsort()
@@ -167,21 +167,16 @@ def model_features_importance(model_name, metric):
     values = list_importance[idx]
     
     if hasattr(model.steps[0][1], 'feature_name_'):
-        try: 
-            features = np.array(model.steps[0][1].feature_name_)[idx]
-        except Exception as e: 
-            erreur = e
-            features = []
-            for i in range(len(idx)):
-                features.append('colonne'+str(idx[i]))    
+        preproc = load_preprocessing(chemin, model_name)
+        list_colonnes = preproc.get_feature_names_out().tolist()
+        list_colonnes = pd.Series(list_colonnes).str.replace('quanti__','').str.replace('remainder__','').str.replace('quali__','').tolist()
+        features = list_colonnes    
     else:        
         features = model.steps[0][1].feature_names_in_[idx]
         
     features_dictionary = dict()
     for i in range(len(values)):    
         features_dictionary[features[i]] =values[i] 
-    if erreur != '':        
-        features_dictionary[str(erreur)] = 1000    
     
     return features_dictionary
 
