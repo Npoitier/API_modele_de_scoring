@@ -168,7 +168,7 @@ def model_features_importance(model_name, metric):
     
     if hasattr(model.steps[0][1], 'feature_name_'):
         try: 
-            features = np.array(model.steps[0][1].feature_name_)[idxe]
+            features = np.array(model.steps[0][1].feature_name_)[idx]
         except Exception as e: 
             erreur = e
             features = []
