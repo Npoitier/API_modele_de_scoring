@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 from lime import lime_tabular
 from fastapi import FastAPI, Response
 from lightgbm import LGBMClassifier
+
 app = FastAPI()
 
 chemin_models = "./models/"
@@ -164,10 +165,10 @@ def model_features_importance(model_name, metric):
         i -= 1
     values = list_importance[idx]
     
-    if hasattr(model.steps[0][1], 'feature_names_in_'):
-        features = model.steps[0][1].feature_names_in_[idx]
-    else:
+    if hasattr(model.steps[0][1], 'feature_name_'):
         features = np.array(model.steps[0][1].feature_name_)[idx]
+    else:        
+        features = model.steps[0][1].feature_names_in_[idx]
         
     features_dictionary = dict()
     for i in range(len(values)):    
