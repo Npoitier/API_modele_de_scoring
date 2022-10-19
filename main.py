@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from lime import lime_tabular
 from fastapi import FastAPI, Response
+from lightgbm import LGBMClassifier
 app = FastAPI()
 
 chemin_models = "./models/"
