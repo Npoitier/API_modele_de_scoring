@@ -180,7 +180,7 @@ def hello():
     
 @app.get("/featureimportance/{model}/metric/{metric}")
 def featureimportance(model: str, metric : str, response: Response):
-    features_dictionary = model_features_importance(model_name, metric)
+    features_dictionary = model_features_importance(model, metric)
     return features_dictionary
 
     
