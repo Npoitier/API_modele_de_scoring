@@ -149,45 +149,39 @@ def lime_importance(model_name, id_pret, metric):
 
 def model_features_importance(model_name, metric):
     features_dictionary = dict()
-    try:
-        chemin = get_chemin()
     
-        model, feat, seuil = load_model(chemin, model_name, metric)
-        list_importance = model.steps[0][1].feature_importances_
-        # il y a un pb avec encode json et int
-        test = []
-        for i in range(len(list_importance)):
-            test.append(float(list_importance[i]))
-        list_importance = np.array(test)
-        # on classe les indices d'importance des features
-        importance = list_importance.argsort()
+    chemin = get_chemin()
+    model, feat, seuil = load_model(chemin, model_name, metric)
+    list_importance = model.steps[0][1].feature_importances_
+    # il y a un pb avec encode json et int
+    test = []
+    for i in range(len(list_importance)):
+        test.append(float(list_importance[i]))
+    list_importance = np.array(test)
+    # on classe les indices d'importance des features
+    importance = list_importance.argsort()
     
-        # on stocke le max
-        maxi = list_importance[importance[-1]]
-        i = -1
-        idx = []
-        while ((list_importance[importance[i]]>maxi*0.05) & (len(importance)+i != 0 )):        
-            idx.append(importance[i])
-            i -= 1
-        values = list_importance[idx]
+    # on stocke le max
+    maxi = list_importance[importance[-1]]
+    i = -1
+    idx = []
+    while ((list_importance[importance[i]]>maxi*0.05) & (len(importance)+i != 0 )):        
+        idx.append(importance[i])
+        i -= 1
+    values = list_importance[idx]
     
-        if hasattr(model.steps[0][1], 'feature_name_'):
-            preproc = load_preprocessing(chemin, model_name)
-            list_colonnes = preproc.get_feature_names_out().tolist()
-            list_colonnes = pd.Series(list_colonnes).str.replace('quanti__','').str.replace('remainder__','').str.replace('quali__','').tolist()
-            features = list_colonnes    
-            for elt in range(len(features)):
-                features[elt] = re.sub('[^A-Za-z0-9_]+', '', features[elt])
-            features = np.array(features)[idx]
-        else:        
-            features = model.steps[0][1].feature_names_in_[idx]
-                
-        for i in range(len(values)):    
-            features_dictionary[features[i]] =values[i] 
-    except Exception as e:
-            erreur = e            
-            features_dictionary[str(erreur)] = 1000.0
+    if hasattr(model.steps[0][1], 'feature_name_'):
+        features = np.array(model.steps[0][1].feature_name_)[idx]
+    else:        
+        features = model.steps[0][1].feature_names_in_[idx]
     
+    values = values.tolist()
+    values.reverse()
+    features = features.tolist()
+    features.reverse()
+    for i in range(len(values)):    
+        features_dictionary[features[i]] =values[i]
+        
     return features_dictionary
 
 @app.get("/")
