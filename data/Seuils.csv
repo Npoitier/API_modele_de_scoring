@@ -1,5 +1,5 @@
 ,Classifier,metric,seuil
-0,LGBMClassifier,average_precision_score,0.18
-1,LGBMClassifier,BAW_metrique,0.04
+0,LGBMClassifier,average_precision_score,0.45
+1,LGBMClassifier,BAW_metrique,0.49 
 2,RandomForestClassifier,average_precision_score,0.15
-3,RandomForestClassifier,BAW_metrique,0.02
+3,RandomForestClassifier,BAW_metrique,0.2
