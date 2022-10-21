@@ -1,13 +1,13 @@
-from pathlib import Path
+# from pathlib import Path
 import pandas as pd
-import streamlit as st
+# import streamlit as st
 import pickle
 import re
 import numpy as np
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 from lime import lime_tabular
 from fastapi import FastAPI, Response
-from lightgbm import LGBMClassifier
+# from lightgbm import LGBMClassifier
 
 app = FastAPI()
 
@@ -98,7 +98,7 @@ def shap_importance(model_name,id_pret, metric):
     height = height[:,0].tolist()
     #somme = np.sum(height)
     maxi = np.max(np.abs(height))
-    mini = np.min(np.abs(height))
+    # mini = np.min(np.abs(height))
     bars = df_shap_values.columns.tolist()
     bars = [bars[x] for x in range(len(height)) if np.abs(height[x]) >= maxi*0.05]
     height = [height[x] for x in range(len(height)) if np.abs(height[x]) >= maxi*0.05]
@@ -135,7 +135,7 @@ def lime_importance(model_name, id_pret, metric):
     height.reverse()    
     #somme = np.sum(height)
     maxi = np.max(np.abs(height))
-    mini = np.min(np.abs(height))
+    # mini = np.min(np.abs(height))
     bars = list_cols
     bars.reverse()
     bars = [bars[x] for x in range(len(height)) if np.abs(height[x]) >= maxi*0.05]
