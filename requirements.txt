@@ -1,9 +1,4 @@
+fastapi==0.85.1
 lime==0.2.0.1
-matplotlib==3.5.2
 numpy==1.21.5
 pandas==1.4.4
-streamlit==1.13.0
-imblearn<0.9.1
-lightgbm==3.3.2
-fastapi==0.85.0
-uvicorn==0.18.3
